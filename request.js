@@ -1118,7 +1118,7 @@ Request.prototype.readResponseBody = function (response) {
       // This can lead to leaky behavior if the user retains a reference to the request object.
       buffers = []
       bufferLength = 0
-      self.emit('error', self._err)
+      self.emit('error', self._err || new Error('aborted.'))
       return
     }
 
