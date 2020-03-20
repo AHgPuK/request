@@ -1118,6 +1118,7 @@ Request.prototype.readResponseBody = function (response) {
       // This can lead to leaky behavior if the user retains a reference to the request object.
       buffers = []
       bufferLength = 0
+      self.emit('error', self._err)
       return
     }
 
@@ -1155,9 +1156,10 @@ Request.prototype.readResponseBody = function (response) {
   })
 }
 
-Request.prototype.abort = function () {
+Request.prototype.abort = function (err) {
   var self = this
   self._aborted = true
+  self._err = err;
 
   if (self.req) {
     self.req.abort()
@@ -1485,7 +1487,9 @@ Request.prototype.pipe = function (dest, opts) {
 }
 Request.prototype.write = function () {
   var self = this
-  if (self._aborted) { return }
+  if (self._aborted) {
+    return
+  }
 
   if (!self._started) {
     self.start()
@@ -1496,7 +1500,9 @@ Request.prototype.write = function () {
 }
 Request.prototype.end = function (chunk) {
   var self = this
-  if (self._aborted) { return }
+  if (self._aborted) {
+    return
+  }
 
   if (chunk) {
     self.write(chunk)
