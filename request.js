@@ -287,7 +287,16 @@ Request.prototype.init = function (options) {
   self.setHost = false
   if (!self.hasHeader('host')) {
     var hostHeaderName = self.originalHostHeaderName || 'host'
-    self.setHeader(hostHeaderName, self.uri.host)
+    // Need to keep Host header to be first
+// self.setHeader(hostHeaderName, self.uri.host)
+    var headers = {
+      ...self.headers,
+    }
+    Object.keys(self.headers).map(key => delete self.headers[key]);
+    Object.assign(self.headers, {
+      [hostHeaderName]: self.uri.host,
+      ...headers,
+    })
     // Drop :port suffix from Host header if known protocol.
     if (self.uri.port) {
       if ((self.uri.port === '80' && self.uri.protocol === 'http:') ||
